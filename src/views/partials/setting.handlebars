@@ -1,0 +1,22 @@
+<form method="post">
+    <label>
+        {{key}} ({{type}}):
+        {{#switch type}}
+            {{#case "boolean"}}
+                <select name="value">
+                    <option value="true" {{#ifCond value '===' 'true'}}selected{{/ifCond}}>true</option>
+                    <option value="false" {{#ifCond value '!==' 'true'}}selected{{/ifCond}}>false</option>
+                </select>
+            {{/case}}
+            {{#case "number"}}
+                <input type="number" name="value" value="{{value}}" />
+            {{/case}}
+            {{#case "string"}}
+                <input type="text" name="value" value="{{value}}" />
+            {{/case}}
+        {{/switch}}
+    </label>
+    <input type="hidden" name="key" value="{{key}}" />
+    <input type="hidden" name="type" value="{{type}}" />
+    <input type="submit" value="Save" />
+</form>

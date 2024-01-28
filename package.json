@@ -9,7 +9,7 @@
     "styles": "sass src/styles/main.scss dist/css/main.css",
     "styles:watch": "sass src/styles/main.scss dist/css/main.css -w",
     "start": "node dist/index.js",
-    "start:watch": "nodemon dist/index.js",
+    "start:watch": "nodemon dist/index.js --ignore data/",
     "dev": "concurrently \"npm run build:watch\" \"npm run styles:watch\" \"npm run start:watch\" --names \"BUILD,SASS,SERVER\" --prefix \"{time} [{name}]\"",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts"
