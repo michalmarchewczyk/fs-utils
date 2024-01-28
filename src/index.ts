@@ -3,6 +3,8 @@ import { create } from 'express-handlebars';
 import path from 'node:path';
 import Settings, { type SettingDto } from './settings';
 import type * as handlebars from 'handlebars';
+import multer from 'multer';
+import { ServerResponse } from 'node:http';
 
 const app = express();
 
@@ -22,7 +24,6 @@ const hbs = create({
         case '===':
           return v1 === v2 ? options.fn(this) : options.inverse(this);
         case '!==':
-          // eslint-disable-next-line no-negated-condition
           return v1 !== v2 ? options.fn(this) : options.inverse(this);
         case '<':
           return v1 < v2 ? options.fn(this) : options.inverse(this);
@@ -46,9 +47,28 @@ const hbs = create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', 'src/views');
-app.use(express.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  if (req.headers['x-enhanced-form']) {
+    next();
+    return;
+  }
+
+  req.headers['x-enhanced-form'] = 'true';
+
+  const req2 = { ...req } as express.Request;
+  const res2 = new ServerResponse(req);
+  app(req2, res2);
+
+  req.method = 'GET';
+  next();
+});
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(multer().none());
 app.use('/css', express.static(path.join(__dirname, './css/')));
+app.use('/scripts', express.static(path.join(__dirname, './scripts/')));
 
 app.get('/', (req, res) => {
   res.render('home');
@@ -75,7 +95,8 @@ app.get('/settings', async (req, res) => {
 app.post('/settings', async (req, res) => {
   const dto = req.body as SettingDto;
   settings.fromDto(dto);
-  res.render('settings', { settings: settings.toDto() });
+  console.log('SENDING SETTINGS');
+  res.json({ success: true });
 });
 
 const port = process.env.PORT ?? 8080;

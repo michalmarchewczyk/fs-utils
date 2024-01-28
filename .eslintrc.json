@@ -13,7 +13,12 @@
             "files": [
                 "*.ts",
                 "*.tsx"
-            ]
+            ],
+            "rules": {
+                "@typescript-eslint/no-misused-promises": "off",
+                "@typescript-eslint/class-literal-property-style": "off",
+                "@typescript-eslint/consistent-type-assertions": "off"
+            }
         }
     ],
     "parserOptions": {
@@ -21,6 +26,9 @@
         "sourceType": "module"
     },
     "rules": {
-        "@typescript-eslint/no-misused-promises": "off"
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/class-literal-property-style": "off",
+        "no-negated-condition": "off",
+        "@typescript-eslint/consistent-type-assertions": "off"
     }
 }
