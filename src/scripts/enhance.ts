@@ -4,22 +4,16 @@ class EnhancedForm {
     private readonly form: HTMLFormElement,
   ) {
     this.form.addEventListener('submit', async (e) => this.onSubmit(e));
-    this.form.addEventListener('input', () => {
-      this.onChanged();
-    });
-    this.form.addEventListener('change', () => {
-      this.onChanged();
-    });
+    this.form.addEventListener('input', () => this.onChanged());
+    this.form.addEventListener('change', () => this.onChanged());
   }
 
   private onChanged(changed = true) {
-    this.form.querySelectorAll<HTMLElement>('[data-enh-changed]').forEach((element) => {
-      if (changed) {
-        this.enhancer.enableElement(element);
-      } else {
-        this.enhancer.disableElement(element);
-      }
-    });
+    if (changed) {
+      this.enhancer.enableSelector('changed', this.form);
+    } else {
+      this.enhancer.disableSelector('changed', this.form);
+    }
   }
 
   private async onSubmit(e: SubmitEvent) {
@@ -37,12 +31,8 @@ class EnhancedForm {
       url += `?${query.toString()}`;
     }
 
-    this.form.querySelectorAll<HTMLElement>('[data-enh-loading]').forEach((element) => {
-      this.enhancer.enableElement(element);
-    });
-    this.form.querySelectorAll<HTMLElement>('[data-enh-ready]').forEach((element) => {
-      this.enhancer.disableElement(element);
-    });
+    this.enhancer.disableSelector('ready', this.form);
+    this.enhancer.enableSelector('loading', this.form);
 
     const res = await fetch(url, {
       method,
@@ -61,12 +51,8 @@ class EnhancedForm {
       return;
     }
 
-    this.form.querySelectorAll<HTMLElement>('[data-enh-loading]').forEach((element) => {
-      this.enhancer.disableElement(element);
-    });
-    this.form.querySelectorAll<HTMLElement>('[data-enh-ready]').forEach((element) => {
-      this.enhancer.enableElement(element);
-    });
+    this.enhancer.enableSelector('ready', this.form);
+    this.enhancer.disableSelector('loading', this.form);
     this.onChanged(false);
   }
 }
@@ -103,6 +89,18 @@ class Enhancer {
     if (modType === 'display') {
       element.style.display = 'none';
     }
+  }
+
+  public enableSelector(selector: string, parent: HTMLElement = document.body) {
+    parent.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}${selector}]`).forEach((element) => {
+      this.enableElement(element);
+    });
+  }
+
+  public disableSelector(selector: string, parent: HTMLElement = document.body) {
+    parent.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}${selector}]`).forEach((element) => {
+      this.disableElement(element);
+    });
   }
 
   private getElementModType(element: HTMLElement) {
