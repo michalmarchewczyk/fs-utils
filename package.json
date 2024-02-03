@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc -w",
-    "styles": "sass src/styles/main.scss dist/css/main.css",
-    "styles:watch": "sass src/styles/main.scss dist/css/main.css -w",
+    "build:server": "esbuild src/index.ts --bundle --minify --platform=node --packages=external --outfile=dist/index.js",
+    "build:server:watch": "esbuild src/index.ts --bundle --minify  --platform=node --packages=external --outfile=dist/index.js --watch",
+    "build:client": "esbuild src/scripts/index.ts --bundle --minify --platform=browser --outfile=dist/scripts/index.js",
+    "build:client:watch": "esbuild src/scripts/index.ts --bundle --minify --platform=browser --outfile=dist/scripts/index.js --watch",
+    "build": "npm run build:server && npm run build:client",
+    "build:watch": "concurrently \"npm run build:server:watch\" \"npm run build:client:watch\" --names \"SERVER,CLIENT\" --prefix \"[{name}]\"",
+    "styles": "sass --style=compressed src/styles/main.scss dist/css/main.css && purgecss --css dist/css/main.css --content src/views/**/* --output dist/css/main.min.css",
+    "styles:watch": "nodemon --watch src/styles --exec \"npm run styles\"",
     "start": "node dist/index.js",
     "start:watch": "nodemon dist/index.js --ignore data/",
     "dev": "concurrently \"npm run build:watch\" \"npm run styles:watch\" \"npm run start:watch\" --names \"BUILD,SASS,SERVER\" --prefix \"{time} [{name}]\"",
@@ -21,7 +25,8 @@
     "express": "^4.18.2",
     "express-handlebars": "^7.1.2",
     "handlebars": "^4.7.8",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "purgecss": "^5.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
@@ -30,6 +35,7 @@
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "concurrently": "^8.2.2",
+    "esbuild": "^0.20.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard-with-typescript": "^43.0.0",

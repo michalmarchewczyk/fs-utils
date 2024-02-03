@@ -20,7 +20,8 @@ class EnhancedForm {
     e.preventDefault();
     const formData = new FormData(this.form);
     const method = this.form.getAttribute('method') ?? 'GET';
-    let url = this.form.getAttribute('action') ?? '';
+    let url = e.submitter?.getAttribute('formaction') ?? this.form.getAttribute('action') ?? '';
+    const reloadTags = this.form.getAttribute('data-enh-reload')?.split(' ') ?? [];
 
     if (method === 'GET') {
       const query = new URLSearchParams();
@@ -47,8 +48,12 @@ class EnhancedForm {
     const data = isJson ? ((await res.json()) as Record<string, unknown>) : await res.text();
 
     if (!isJson) {
-      window.location.reload();
+      Window.location.reload();
       return;
+    }
+
+    for (const tag of reloadTags) {
+      this.enhancer.reloadTag(tag);
     }
 
     this.enhancer.enableSelector('ready', this.form);
@@ -57,13 +62,15 @@ class EnhancedForm {
   }
 }
 
-class Enhancer {
+export default class Enhancer {
   private static readonly prefix = 'enh-';
   private static readonly displayDisableClassList = ['d-none'];
   private readonly forms: EnhancedForm[] = [];
+  private readonly tags: Record<string, HTMLElement[]> = {};
 
   public init() {
     this.initForms();
+    this.initTags();
   }
 
   public enableElement(element: HTMLElement) {
@@ -72,7 +79,6 @@ class Enhancer {
       (element as any).disabled = false;
       return;
     }
-
     if (modType === 'display') {
       element.classList.remove(...Enhancer.displayDisableClassList);
       element.style.display = '';
@@ -85,7 +91,6 @@ class Enhancer {
       (element as any).disabled = true;
       return;
     }
-
     if (modType === 'display') {
       element.style.display = 'none';
     }
@@ -107,7 +112,6 @@ class Enhancer {
     if (element.hasAttribute(`data-${Enhancer.prefix}state`)) {
       return 'state';
     }
-
     return 'display';
   }
 
@@ -117,7 +121,35 @@ class Enhancer {
       this.forms.push(new EnhancedForm(this, form));
     }
   }
-}
 
-const enhancer = new Enhancer();
-enhancer.init();
+  private initTags() {
+    const tags = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}tag]`);
+    for (const tag of tags) {
+      const tagName = tag.getAttribute(`data-${Enhancer.prefix}tag`) ?? '';
+      if (!this.tags[tagName]) {
+        this.tags[tagName] = [];
+      }
+      this.tags[tagName].push(tag);
+    }
+  }
+
+  public reloadTag(tagName: string) {
+    const elements = this.tags[tagName] ?? [];
+    for (const element of elements) {
+      const partial = element.getAttribute(`data-${Enhancer.prefix}partial`) ?? '';
+      if (partial) {
+        fetch('/partials/' + partial)
+          .then(async (res) => {
+            console.log('res', res);
+            return res.text();
+          })
+          .then((html) => {
+            element.innerHTML = html;
+          })
+          .catch((e) => {
+            console.error('Error loading partial', e);
+          });
+      }
+    }
+  }
+}

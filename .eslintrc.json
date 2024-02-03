@@ -19,7 +19,9 @@
                 "@typescript-eslint/class-literal-property-style": "off",
                 "@typescript-eslint/consistent-type-assertions": "off",
                 "@typescript-eslint/member-ordering": "off",
-                "@typescript-eslint/no-confusing-void-expression": "off"
+                "@typescript-eslint/no-confusing-void-expression": "off",
+                "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }],
+                "@typescript-eslint/padding-line-between-statements": "off"
             }
         }
     ],
@@ -33,6 +35,8 @@
         "no-negated-condition": "off",
         "@typescript-eslint/consistent-type-assertions": "off",
         "@typescript-eslint/member-ordering": "off",
-        "@typescript-eslint/no-confusing-void-expression": "off"
+        "@typescript-eslint/no-confusing-void-expression": "off",
+        "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }],
+        "@typescript-eslint/padding-line-between-statements": "off"
     }
 }
