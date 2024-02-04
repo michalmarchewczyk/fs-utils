@@ -1,0 +1,15 @@
+<form
+    method="POST"
+    data-enh-form
+    data-enh-reload="sync-record/{{id}}"
+    data-enh-content="/sync/record/{{id}}"
+    data-enh-tag="sync-record/{{id}}"
+>
+    <input type="hidden" name="id" value="{{id}}" />
+    <input name="from" placeholder="From" value="{{from}}" />
+    <button formaction="swap">Swap</button>
+    <input name="to" placeholder="To" value="{{to}}" />
+    <textarea name="description" placeholder="Description">{{description}}</textarea>
+    <button formaction="sync">Sync</button>
+    <button formaction="update" data-enh-changed data-enh-state>Save</button>
+</form>

@@ -8,14 +8,25 @@ export type SettingDto = {
 };
 
 export default class Settings {
+  private static instance: Settings;
   public static loaded = false;
   private static readonly filePath = path.join(__dirname, './data/settings.json');
   public oldPrefix = 'old';
   public saveLogs = true;
 
+  public static getInstance() {
+    if (!Settings.instance) {
+      Settings.instance = new Settings();
+    }
+
+    return Settings.instance;
+  }
+
+  private constructor() {}
+
   public async saveToFile() {
     await fs.mkdir(path.dirname(Settings.filePath), { recursive: true });
-    const data = JSON.stringify(this);
+    const data = JSON.stringify(this, null, 2);
     await fs.writeFile(Settings.filePath, data, { encoding: 'utf-8' });
   }
 

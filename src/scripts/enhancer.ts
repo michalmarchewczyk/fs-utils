@@ -1,66 +1,4 @@
-class EnhancedForm {
-  constructor(
-    private readonly enhancer: Enhancer,
-    private readonly form: HTMLFormElement,
-  ) {
-    this.form.addEventListener('submit', async (e) => this.onSubmit(e));
-    this.form.addEventListener('input', () => this.onChanged());
-    this.form.addEventListener('change', () => this.onChanged());
-  }
-
-  private onChanged(changed = true) {
-    if (changed) {
-      this.enhancer.enableSelector('changed', this.form);
-    } else {
-      this.enhancer.disableSelector('changed', this.form);
-    }
-  }
-
-  private async onSubmit(e: SubmitEvent) {
-    e.preventDefault();
-    const formData = new FormData(this.form);
-    const method = this.form.getAttribute('method') ?? 'GET';
-    let url = e.submitter?.getAttribute('formaction') ?? this.form.getAttribute('action') ?? '';
-    const reloadTags = this.form.getAttribute('data-enh-reload')?.split(' ') ?? [];
-
-    if (method === 'GET') {
-      const query = new URLSearchParams();
-      for (const [key, value] of formData) {
-        query.append(key, value as string);
-      }
-
-      url += `?${query.toString()}`;
-    }
-
-    this.enhancer.disableSelector('ready', this.form);
-    this.enhancer.enableSelector('loading', this.form);
-
-    const res = await fetch(url, {
-      method,
-      body: method !== 'GET' ? formData : undefined,
-      headers: {
-        'X-Enhanced-Form': 'true',
-      },
-    });
-
-    const isJson = res.headers.get('Content-Type')?.includes('application/json');
-
-    const data = isJson ? ((await res.json()) as Record<string, unknown>) : await res.text();
-
-    if (!isJson) {
-      Window.location.reload();
-      return;
-    }
-
-    for (const tag of reloadTags) {
-      this.enhancer.reloadTag(tag);
-    }
-
-    this.enhancer.enableSelector('ready', this.form);
-    this.enhancer.disableSelector('loading', this.form);
-    this.onChanged(false);
-  }
-}
+import EnhancedForm from './enhanced-form';
 
 export default class Enhancer {
   private static readonly prefix = 'enh-';
@@ -122,6 +60,20 @@ export default class Enhancer {
     }
   }
 
+  private refreshForms() {
+    const formElements = document.querySelectorAll<HTMLFormElement>(`form[data-${Enhancer.prefix}form]`);
+    for (const form of formElements) {
+      if (!this.forms.find((f) => f.form === form)) {
+        this.forms.push(new EnhancedForm(this, form));
+      }
+    }
+    for (const form of this.forms) {
+      if (![...formElements].find((f) => f === form.form)) {
+        this.forms.splice(this.forms.indexOf(form), 1);
+      }
+    }
+  }
+
   private initTags() {
     const tags = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}tag]`);
     for (const tag of tags) {
@@ -133,21 +85,43 @@ export default class Enhancer {
     }
   }
 
+  private refreshTags() {
+    const tagElements = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}tag]`);
+    for (const element of tagElements) {
+      const tagName = element.getAttribute(`data-${Enhancer.prefix}tag`) ?? '';
+      if (!this.tags[tagName]) {
+        this.tags[tagName] = [];
+      }
+      if (!this.tags[tagName].find((e) => e === element)) {
+        this.tags[tagName].push(element);
+      }
+    }
+    for (const tagName in this.tags) {
+      if (!this.tags[tagName]) {
+        this.tags[tagName] = [];
+      }
+    }
+  }
+
   public reloadTag(tagName: string) {
     const elements = this.tags[tagName] ?? [];
     for (const element of elements) {
+      let url = element.getAttribute(`data-${Enhancer.prefix}content`) ?? '';
       const partial = element.getAttribute(`data-${Enhancer.prefix}partial`) ?? '';
       if (partial) {
-        fetch('/partials/' + partial)
-          .then(async (res) => {
-            console.log('res', res);
-            return res.text();
-          })
+        url = `/partials/${partial}`;
+      }
+      if (url) {
+        fetch(url)
+          .then(async (res) => res.text())
           .then((html) => {
             element.innerHTML = html;
+            this.refreshForms();
+            this.refreshTags();
+            this.forms.filter((f) => f.form.contains(element)).forEach((f) => f.refresh());
           })
           .catch((e) => {
-            console.error('Error loading partial', e);
+            console.error('Error loading partial/content', e);
           });
       }
     }

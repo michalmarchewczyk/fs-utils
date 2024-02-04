@@ -5,6 +5,8 @@ import Settings, { type SettingDto } from './settings';
 import type * as handlebars from 'handlebars';
 import multer from 'multer';
 import { ServerResponse } from 'node:http';
+import SyncManager from './sync-manager';
+import SyncRecord, { type SyncRecordDto } from './sync-record';
 
 const app = express();
 
@@ -49,7 +51,7 @@ app.set('view engine', 'handlebars');
 app.set('views', 'src/views');
 
 app.use((req, res, next) => {
-  if (req.headers['x-enhanced-form']) {
+  if (req.method === 'GET' || req.headers['x-enhanced-form']) {
     next();
     return;
   }
@@ -64,6 +66,24 @@ app.use((req, res, next) => {
   next();
 });
 
+const settings = Settings.getInstance();
+void settings.createFile().then(() => {
+  console.log('Initialized settings file');
+});
+const syncManager = SyncManager.getInstance();
+void syncManager.createFile().then(() => {
+  console.log('Initialized sync file');
+});
+
+const getState = () => ({
+  settings: settings.toDto(),
+  syncRecords: syncManager.records,
+});
+
+app.get('/partials/:name', (req, res) => {
+  res.render(`partials/${req.params.name}`, { layout: false, state: getState() });
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(multer().none());
@@ -72,11 +92,6 @@ app.use('/scripts', express.static(path.join(__dirname, './scripts/')));
 
 app.get('/', (req, res) => {
   res.render('home');
-});
-
-const settings = new Settings();
-void settings.createFile().then(() => {
-  console.log('Initialized settings file');
 });
 
 app.get('/settings', async (req, res) => {
@@ -89,13 +104,62 @@ app.get('/settings', async (req, res) => {
     return;
   }
 
-  res.render('settings', { settings: settings.toDto() });
+  res.render('settings', { state: getState() });
 });
 
 app.post('/settings', async (req, res) => {
   const dto = req.body as SettingDto;
   settings.fromDto(dto);
-  console.log('SENDING SETTINGS');
+  res.json({ success: true });
+});
+
+app.get('/sync/record/:id', async (req, res) => {
+  const record = syncManager.getRecord(req.params.id);
+  const rendered = await hbs.render('src/views/partials/sync-record.handlebars', { layout: false, ...record });
+  res.send(rendered);
+});
+
+app.get('/sync', async (req, res) => {
+  try {
+    if (!syncManager.loaded) {
+      await syncManager.loadFromFile();
+    }
+  } catch (e: any) {
+    res.render('error', { error: e.message as string });
+    return;
+  }
+
+  res.render('sync', { state: getState() });
+});
+
+app.get('/sync/*', (req, res) => {
+  res.redirect('/sync/');
+});
+
+app.post('/sync/create', async (req, res) => {
+  const dto = req.body as SyncRecordDto;
+  const record = SyncRecord.fromDto(dto);
+  syncManager.addRecord(record);
+  await syncManager.saveToFile();
+  res.json({ success: true });
+});
+
+app.post('/sync/sync', async (req, res) => {
+  res.json({ success: true });
+});
+
+app.post('/sync/update', async (req, res) => {
+  const dto = req.body as SyncRecordDto;
+  const record = SyncRecord.fromDto(dto);
+  syncManager.replaceRecord(record);
+  await syncManager.saveToFile();
+  res.json({ success: true });
+});
+
+app.post('/sync/swap', async (req, res) => {
+  const id = req.body.id as string;
+  syncManager.swapRecord(id);
+  await syncManager.saveToFile();
   res.json({ success: true });
 });
 

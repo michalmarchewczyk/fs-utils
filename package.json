@@ -11,7 +11,7 @@
     "build": "npm run build:server && npm run build:client",
     "build:watch": "concurrently \"npm run build:server:watch\" \"npm run build:client:watch\" --names \"SERVER,CLIENT\" --prefix \"[{name}]\"",
     "styles": "sass --style=compressed src/styles/main.scss dist/css/main.css && purgecss --css dist/css/main.css --content src/views/**/* --output dist/css/main.min.css",
-    "styles:watch": "nodemon --watch src/styles --exec \"npm run styles\"",
+    "styles:watch": "nodemon --watch src --exec \"npm run styles\"",
     "start": "node dist/index.js",
     "start:watch": "nodemon dist/index.js --ignore data/",
     "dev": "concurrently \"npm run build:watch\" \"npm run styles:watch\" \"npm run start:watch\" --names \"BUILD,SASS,SERVER\" --prefix \"{time} [{name}]\"",
