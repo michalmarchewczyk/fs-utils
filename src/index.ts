@@ -7,10 +7,18 @@ import multer from 'multer';
 import { ServerResponse } from 'node:http';
 import SyncManager from './sync-manager';
 import SyncRecord, { type SyncRecordDto } from './sync-record';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import Logger from './logger';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 
 const hbs = create({
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+  },
   helpers: {
     switch(value: string, options: handlebars.HelperOptions) {
       this.switch_value = value;
@@ -75,9 +83,12 @@ void syncManager.createFile().then(() => {
   console.log('Initialized sync file');
 });
 
+const logger = Logger.getInstance();
+
 const getState = () => ({
   settings: settings.toDto(),
   syncRecords: syncManager.records,
+  logs: logger.getLogs(),
 });
 
 app.get('/partials/:name', (req, res) => {
@@ -92,6 +103,19 @@ app.use('/scripts', express.static(path.join(__dirname, './scripts/')));
 
 app.get('/', (req, res) => {
   res.render('home');
+});
+
+app.get('/logs', (req, res) => {
+  res.render('logs', { state: getState() });
+});
+
+app.get('/logs/data', (req, res) => {
+  const stream = logger.getLogsStream();
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+  stream.pipe(res);
 });
 
 app.get('/settings', async (req, res) => {
@@ -115,7 +139,11 @@ app.post('/settings', async (req, res) => {
 
 app.get('/sync/record/:id', async (req, res) => {
   const record = syncManager.getRecord(req.params.id);
-  const rendered = await hbs.render('src/views/partials/sync-record.handlebars', { layout: false, ...record });
+  const rendered = await hbs.render('src/views/partials/sync-record.handlebars', {
+    layout: false,
+    ...record,
+    parentFolder: record?.parentFolder,
+  });
   res.send(rendered);
 });
 
@@ -145,6 +173,12 @@ app.post('/sync/create', async (req, res) => {
 });
 
 app.post('/sync/sync', async (req, res) => {
+  const record = syncManager.getRecord(req.body.id as string);
+  if (!record) {
+    res.json({ success: false });
+    return;
+  }
+  record.sync();
   res.json({ success: true });
 });
 

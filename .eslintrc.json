@@ -21,7 +21,9 @@
                 "@typescript-eslint/member-ordering": "off",
                 "@typescript-eslint/no-confusing-void-expression": "off",
                 "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }],
-                "@typescript-eslint/padding-line-between-statements": "off"
+                "@typescript-eslint/padding-line-between-statements": "off",
+                "@typescript-eslint/ban-types": ["error", {"types": {"null": false}, "extendDefaults": true}],
+                "@typescript-eslint/no-extraneous-class": "off"
             }
         }
     ],
@@ -37,6 +39,8 @@
         "@typescript-eslint/member-ordering": "off",
         "@typescript-eslint/no-confusing-void-expression": "off",
         "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }],
-        "@typescript-eslint/padding-line-between-statements": "off"
+        "@typescript-eslint/padding-line-between-statements": "off",
+        "@typescript-eslint/ban-types": ["error", {"types": {"null": false}, "extendDefaults": true}],
+        "@typescript-eslint/no-extraneous-class": "off"
     }
 }

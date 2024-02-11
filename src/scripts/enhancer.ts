@@ -9,6 +9,7 @@ export default class Enhancer {
   public init() {
     this.initForms();
     this.initTags();
+    this.initIntervals();
   }
 
   public enableElement(element: HTMLElement) {
@@ -51,6 +52,18 @@ export default class Enhancer {
       return 'state';
     }
     return 'display';
+  }
+
+  private initIntervals() {
+    const elements = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}interval]`);
+    for (const element of elements) {
+      const interval = parseInt(element.getAttribute(`data-${Enhancer.prefix}interval`) ?? '0', 10);
+      if (interval > 0) {
+        setInterval(() => {
+          this.reloadTag(element.getAttribute(`data-${Enhancer.prefix}tag`) ?? '');
+        }, interval);
+      }
+    }
   }
 
   private initForms() {
@@ -119,10 +132,21 @@ export default class Enhancer {
             this.refreshForms();
             this.refreshTags();
             this.forms.filter((f) => f.form.contains(element)).forEach((f) => f.refresh());
+            this.refreshScrolls();
           })
           .catch((e) => {
             console.error('Error loading partial/content', e);
           });
+      }
+    }
+  }
+
+  private refreshScrolls() {
+    const scrollElements = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}scroll]`);
+    for (const element of scrollElements) {
+      const scroll = element.getAttribute(`data-${Enhancer.prefix}scroll`) ?? '';
+      if (scroll === 'down') {
+        element.scrollTop = element.scrollHeight;
       }
     }
   }

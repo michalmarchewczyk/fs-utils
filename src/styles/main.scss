@@ -1,1 +1,7 @@
 @import "bootstrap.scss";
+
+#logs {
+  max-height: calc(100vh - 200px);
+  height: calc(100vh - 200px);
+  overflow: scroll;
+}

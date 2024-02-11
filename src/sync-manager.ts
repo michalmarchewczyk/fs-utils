@@ -1,6 +1,10 @@
 import SyncRecord, { type SyncRecordDto } from './sync-record';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default class SyncManager {
   private static instance: SyncManager;
