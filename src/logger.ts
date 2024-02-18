@@ -17,15 +17,14 @@ export type Log = {
 
 export default class Logger extends EventEmitter {
   private static instance: Logger;
-  public static loaded = false;
-  public static logToConsole = false;
+  public static readonly logToConsole = false;
   private static readonly filePath = path.join(
     __dirname,
     './data/logs/',
     new Date().toISOString().replace(/[:\-.T]/g, '-') + '.json',
   );
 
-  public logs: Log[] = [];
+  public logs: Record<string, Log> = {};
 
   public static getInstance() {
     if (!Logger.instance) {
@@ -62,8 +61,22 @@ export default class Logger extends EventEmitter {
     return `${log.date.toISOString()} ${log.message}`;
   }
 
+  private static serializeLogToHtml(log: Log) {
+    return `<span data-id="${log.id}">${Logger.serializeLog(log)}</span>`;
+  }
+
+  public toHtml(truncate = 0) {
+    return Object.values(this.logs)
+      .map(Logger.serializeLogToHtml)
+      .slice(-1 * truncate)
+      .join('\n');
+  }
+
   public getLogs(truncate = 0) {
-    return this.logs.map(Logger.serializeLog).slice(truncate).join('\n');
+    return Object.values(this.logs)
+      .map(Logger.serializeLog)
+      .slice(-1 * truncate)
+      .join('\n');
   }
 
   public getLogsStream() {
@@ -85,7 +98,7 @@ export default class Logger extends EventEmitter {
       date: new Date(),
       type,
     };
-    this.logs.push(log);
+    this.logs[log.id] = log;
     this.emit('log', log);
     void this.appendToFile(log);
     if (Logger.logToConsole) {
@@ -95,7 +108,7 @@ export default class Logger extends EventEmitter {
   }
 
   public replaceLog(id: string, newMessage: string) {
-    const log = this.logs.find((l) => l.id === id);
+    const log = this.logs[id];
     if (!log) {
       throw new Error('Log not found');
     }

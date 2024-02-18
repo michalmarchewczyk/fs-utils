@@ -86,9 +86,11 @@ void syncManager.createFile().then(() => {
 const logger = Logger.getInstance();
 
 const getState = () => ({
-  settings: settings.toDto(),
+  settings,
+  settingsList: settings.toDto(),
   syncRecords: syncManager.records,
-  logs: logger.getLogs(),
+  logs: logger.getLogs(settings.logsTruncate),
+  logsHtml: logger.toHtml(settings.logsTruncate),
 });
 
 app.get('/partials/:name', (req, res) => {
@@ -105,7 +107,20 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
-app.get('/logs', (req, res) => {
+const settingsMiddleware = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    if (!Settings.loaded) {
+      await settings.loadFromFile();
+    }
+  } catch (e: any) {
+    res.render('error', { error: e.message as string });
+    return;
+  }
+
+  next();
+};
+
+app.get('/logs', settingsMiddleware, (req, res) => {
   res.render('logs', { state: getState() });
 });
 
@@ -118,20 +133,11 @@ app.get('/logs/data', (req, res) => {
   stream.pipe(res);
 });
 
-app.get('/settings', async (req, res) => {
-  try {
-    if (!Settings.loaded) {
-      await settings.loadFromFile();
-    }
-  } catch (e: any) {
-    res.render('error', { error: e.message as string });
-    return;
-  }
-
+app.get('/settings', settingsMiddleware, async (req, res) => {
   res.render('settings', { state: getState() });
 });
 
-app.post('/settings', async (req, res) => {
+app.post('/settings', settingsMiddleware, async (req, res) => {
   const dto = req.body as SettingDto;
   settings.fromDto(dto);
   res.json({ success: true });

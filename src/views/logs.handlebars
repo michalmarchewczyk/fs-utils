@@ -1,31 +1,6 @@
-<pre id="logs">
-{{state.logs}}
+<pre id="logs" data-truncate="{{state.settings.logsTruncate}}">
+{{{state.logsHtml}}}
 </pre>
 
-<script type="application/javascript" defer>
-    console.log("Logs view loaded");
-    const textDecoder = new TextDecoder();
-    const container = document.getElementById('logs');
-    const logElements = [];
-    const eventSource = new EventSource('/logs/data');
-    eventSource.onmessage = (ev) => {
-        const [event, id, ...message] = ev.data.split(':');
-        if (event === 'ADD') {
-            const logElement = document.createElement('span');
-            logElement.textContent = message.join(':').replaceAll('\\n', '\n') + '\n';
-            logElement.dataset.id = id;
-            container.appendChild(logElement);
-            logElements.push(logElement);
-            scrollToBottom();
-        } else if (event === 'REPLACE') {
-            const logElement = logElements.find(el => el.dataset.id === id);
-            if (logElement) {
-                logElement.textContent = message.join(':').replaceAll('\\n', '\n') + '\n';
-            }
-        }
-    };
-    const scrollToBottom = () => {
-        container.scrollTop = container.scrollHeight;
-    };
-    scrollToBottom();
-</script>
+
+<script type="application/javascript" src="/scripts/logs.js"></script>

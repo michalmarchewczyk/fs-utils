@@ -39,7 +39,7 @@ export default class SyncRecord {
         return;
       }
       const log = logger.log(SyncRecord.getLogMessage(copyFrom, copyTo, 0, stat?.size ?? 0));
-      const replace = Utils.throttle((id: string, msg: string) => logger.replaceLog(id, msg), 200);
+      const replace = Utils.throttle((id: string, msg: string) => logger.replaceLog(id, msg), 500);
       copyFile(copyFrom, copyTo, {
         onProgress(info) {
           replace(log, SyncRecord.getLogMessage(copyFrom, copyTo, info.writtenBytes, info.size));

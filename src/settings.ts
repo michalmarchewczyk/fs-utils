@@ -17,6 +17,7 @@ export default class Settings {
   private static readonly filePath = path.join(__dirname, './data/settings.json');
   public oldPrefix = 'old';
   public saveLogs = true;
+  public logsTruncate = 2000;
 
   public static getInstance() {
     if (!Settings.instance) {
@@ -48,6 +49,7 @@ export default class Settings {
       const settings = JSON.parse(data) as Settings;
       this.oldPrefix = settings.oldPrefix;
       this.saveLogs = settings.saveLogs;
+      this.logsTruncate = settings.logsTruncate;
       Settings.loaded = true;
     } catch (e) {
       throw new Error('Error loading settings from file');
@@ -58,6 +60,7 @@ export default class Settings {
     return [
       { key: 'oldPrefix', value: this.oldPrefix, type: 'string' },
       { key: 'saveLogs', value: this.saveLogs.toString(), type: 'boolean' },
+      { key: 'logsTruncate', value: this.logsTruncate.toString(), type: 'number' },
     ];
   }
 
@@ -73,6 +76,9 @@ export default class Settings {
           break;
         case 'saveLogs':
           this.saveLogs = dto.value === 'true';
+          break;
+        case 'logsTruncate':
+          this.logsTruncate = parseInt(dto.value, 10);
           break;
         default:
           throw new Error(`Unknown setting key ${dto.key}`);

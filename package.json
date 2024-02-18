@@ -7,8 +7,8 @@
   "scripts": {
     "build:server": "esbuild src/index.ts --bundle --format=esm --minify --platform=node --packages=external --outfile=dist/index.js",
     "build:server:watch": "esbuild src/index.ts --bundle --format=esm --minify --platform=node --packages=external --outfile=dist/index.js --watch",
-    "build:client": "esbuild src/scripts/index.ts --bundle --minify --platform=browser --outfile=dist/scripts/index.js",
-    "build:client:watch": "esbuild src/scripts/index.ts --bundle --minify --platform=browser --outfile=dist/scripts/index.js --watch",
+    "build:client": "esbuild src/scripts/*.ts --bundle --minify --platform=browser --outdir=dist/scripts/",
+    "build:client:watch": "esbuild src/scripts/*.ts --bundle --minify --platform=browser --outdir=dist/scripts/ --watch",
     "build": "npm run build:server && npm run build:client",
     "build:watch": "concurrently \"npm run build:server:watch\" \"npm run build:client:watch\" --names \"SERVER,CLIENT\" --prefix \"[{name}]\"",
     "styles": "sass --style=compressed src/styles/main.scss dist/css/main.css && purgecss --css dist/css/main.css --content src/views/**/* --output dist/css/main.min.css",
