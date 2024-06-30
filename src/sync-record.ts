@@ -1,10 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import chokidar from 'chokidar';
 import globParent from 'glob-parent';
-import { copyFile } from 'copy-file';
-import Logger from './logger';
-import Utils from './utils';
-const logger = Logger.getInstance();
+import CopyFileQueue from './copy-file-queue';
+const copyFileQueue = CopyFileQueue.getInstance();
 
 export type SyncRecordDto = {
   id?: string;
@@ -38,36 +36,11 @@ export default class SyncRecord {
       if (isDirectory) {
         return;
       }
-      const log = logger.log(SyncRecord.getLogMessage(copyFrom, copyTo, 0, stat?.size ?? 0));
-      const replace = Utils.throttle((id: string, msg: string) => logger.replaceLog(id, msg), 500);
-      copyFile(copyFrom, copyTo, {
-        onProgress(info) {
-          replace(log, SyncRecord.getLogMessage(copyFrom, copyTo, info.writtenBytes, info.size));
-        },
-      })
-        .then(() => {
-          replace(log, SyncRecord.getLogMessage(copyFrom, copyTo, stat?.size, stat?.size, true));
-        })
-        .catch((e) => {
-          replace(log, `Error: ${e.message}`);
-        });
+      copyFileQueue.add({ source: copyFrom, destination: copyTo, stat });
     });
     watcher.on('ready', async () => {
       await watcher.close();
     });
-  }
-
-  private static getLogMessage(from: string, to: string, written = 0, size = 0, done = false) {
-    const header = `Copying ${from} to ${to}`;
-    let percent = size ? Math.round((written / size) * 100) : 0;
-    if (done) {
-      percent = 100;
-    }
-    const progress = `(${Utils.humanizeSize(written)}/${Utils.humanizeSize(size)}) ${percent}%`;
-    const barLength = Math.max(120 - progress.length, 10);
-    const barFill = Math.round((barLength * percent) / 100);
-    const bar = `[${'#'.repeat(barFill)}${'-'.repeat(barLength - barFill)}]`;
-    return `${header}\n${progress} ${written !== 0 || done ? bar : ''}`;
   }
 
   get parentFolder() {

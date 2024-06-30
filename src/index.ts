@@ -10,6 +10,7 @@ import SyncRecord, { type SyncRecordDto } from './sync-record';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import Logger from './logger';
+import CopyFileQueue from './copy-file-queue';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -143,6 +144,14 @@ app.post('/settings', settingsMiddleware, async (req, res) => {
   res.json({ success: true });
 });
 
+const copyFileQueue = CopyFileQueue.getInstance();
+
+settings.on('change', async (key: string, value: number) => {
+  if (key === 'maxConcurrency') {
+    copyFileQueue.setMaxConcurrency(value);
+  }
+});
+
 app.get('/sync/record/:id', async (req, res) => {
   const record = syncManager.getRecord(req.params.id);
   const rendered = await hbs.render('src/views/partials/sync-record.handlebars', {
@@ -153,7 +162,7 @@ app.get('/sync/record/:id', async (req, res) => {
   res.send(rendered);
 });
 
-app.get('/sync', async (req, res) => {
+app.get('/sync', settingsMiddleware, async (req, res) => {
   try {
     if (!syncManager.loaded) {
       await syncManager.loadFromFile();
