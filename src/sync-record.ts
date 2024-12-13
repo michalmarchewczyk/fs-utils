@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import chokidar from 'chokidar';
 import globParent from 'glob-parent';
 import CopyFileQueue from './copy-file-queue';
+import DynamicString from './dynamic-string';
 const copyFileQueue = CopyFileQueue.getInstance();
 
 export type SyncRecordDto = {
@@ -19,20 +20,20 @@ export default class SyncRecord {
   public lastSync = new Date(0);
 
   constructor(
-    public from: string,
-    public to: string,
+    public from: DynamicString,
+    public to: DynamicString,
     public autoSync = false,
   ) {}
 
   sync() {
     this.lastSync = new Date();
-    const parentFolder = globParent(this.from);
-    const watcher = chokidar.watch(this.from, { persistent: false });
+    const parentFolder = globParent(this.from.get());
+    const watcher = chokidar.watch(this.from.get(), { persistent: false });
     watcher.on('all', (event, path, stat) => {
       const copyFrom = path.replaceAll('\\', '/');
       const relativePath = copyFrom.replace(parentFolder, '');
       const isDirectory = stat?.isDirectory() ?? false;
-      const copyTo = this.to.replaceAll('\\', '/') + relativePath;
+      const copyTo = this.to.get().replaceAll('\\', '/') + relativePath;
       if (isDirectory) {
         return;
       }
@@ -44,14 +45,14 @@ export default class SyncRecord {
   }
 
   get parentFolder() {
-    return globParent(this.from);
+    return globParent(this.from.get());
   }
 
   toDto(): SyncRecordDto {
     return {
       id: this.id,
-      from: this.from,
-      to: this.to,
+      from: this.from.getRaw(),
+      to: this.to.getRaw(),
       autoSync: this.autoSync,
       lastSync: this.lastSync.toISOString(),
       description: this.description,
@@ -59,7 +60,7 @@ export default class SyncRecord {
   }
 
   static fromDto(dto: SyncRecordDto): SyncRecord {
-    const syncRecord = new SyncRecord(dto.from, dto.to, dto.autoSync);
+    const syncRecord = new SyncRecord(new DynamicString(dto.from), new DynamicString(dto.to), dto.autoSync);
     syncRecord.lastSync = new Date(dto.lastSync ?? 0);
     syncRecord.id = dto.id ?? randomUUID();
     syncRecord.description = dto.description ?? '';

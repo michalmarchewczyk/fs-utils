@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import Logger from './logger';
 import CopyFileQueue from './copy-file-queue';
+import VariablesManager, { type Variable } from './variables-manager';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -75,6 +76,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.locals.query = req.query;
+  next();
+});
+
 const settings = Settings.getInstance();
 void settings.createFile().then(() => {
   console.log('Initialized settings file');
@@ -86,10 +92,19 @@ void syncManager.createFile().then(() => {
 
 const logger = Logger.getInstance();
 
+const variablesManager = VariablesManager.getInstance();
+void variablesManager.createFile().then(() => {
+  console.log('Initialized vars file');
+  void variablesManager.loadFromFile().then(() => {
+    console.log('Loaded vars from file');
+  });
+});
+
 const getState = () => ({
   settings,
   settingsList: settings.toDto(),
-  syncRecords: syncManager.records,
+  syncRecords: syncManager.records.map((r) => ({ ...r.toDto(), parentFolder: r.parentFolder })),
+  varRecords: variablesManager.variables,
   logs: logger.getLogs(settings.logsTruncate),
   logsHtml: logger.toHtml(settings.logsTruncate),
 });
@@ -154,9 +169,10 @@ settings.on('change', async (key: string, value: number) => {
 
 app.get('/sync/record/:id', async (req, res) => {
   const record = syncManager.getRecord(req.params.id);
+  const recordDto = record?.toDto();
   const rendered = await hbs.render('src/views/partials/sync-record.handlebars', {
     layout: false,
-    ...record,
+    ...recordDto,
     parentFolder: record?.parentFolder,
   });
   res.send(rendered);
@@ -209,6 +225,16 @@ app.post('/sync/swap', async (req, res) => {
   const id = req.body.id as string;
   syncManager.swapRecord(id);
   await syncManager.saveToFile();
+  res.json({ success: true });
+});
+
+app.get('/var', async (req, res) => {
+  res.render('var', { state: getState() });
+});
+
+app.post('/var/update', async (req, res) => {
+  const variable = req.body as Variable;
+  variablesManager.setVariable(variable.name, variable.value);
   res.json({ success: true });
 });
 

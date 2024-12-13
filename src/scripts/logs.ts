@@ -12,6 +12,7 @@ for (const child of container.children) {
 }
 
 eventSource.onmessage = (ev) => {
+  console.log('LOGGING', ev.data);
   const [event, id, ...message] = (ev.data as string).split(':');
 
   if (event === 'ADD') {

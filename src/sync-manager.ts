@@ -24,7 +24,11 @@ export default class SyncManager {
 
   public async saveToFile() {
     await fs.mkdir(path.dirname(this.filePath), { recursive: true });
-    const data = JSON.stringify(this.records, null, 2);
+    const data = JSON.stringify(
+      this.records.map((r) => r.toDto()),
+      null,
+      2,
+    );
     await fs.writeFile(this.filePath, data, { encoding: 'utf-8' });
   }
 

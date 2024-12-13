@@ -1,0 +1,11 @@
+<form
+    method="POST"
+    data-enh-form
+    data-enh-reload="var-record/{{id}}"
+    data-enh-content="/var/record/{{id}}"
+    data-enh-tag="var-record/{{id}}"
+>
+    <span>Name: {{name}}</span>
+    <input name="value" placeholder="Value" value="{{value}}" />
+    <button formaction="update" data-enh-changed data-enh-state>Save</button>
+</form>
