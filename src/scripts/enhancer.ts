@@ -1,15 +1,56 @@
 import EnhancedForm from './enhanced-form';
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface Window {
+    enhancerTags: Record<string, HTMLElement[]>;
+  }
+}
+
 export default class Enhancer {
   private static readonly prefix = 'enh-';
   private static readonly displayDisableClassList = ['d-none'];
   private readonly forms: EnhancedForm[] = [];
-  private readonly tags: Record<string, HTMLElement[]> = {};
+
+  private static selectAll<T>(selector: string): T[] {
+    let selected = [...document.querySelectorAll<HTMLElement>(selector)];
+    const iframes = document.querySelectorAll<HTMLIFrameElement>('iframe');
+    for (const iframe of iframes) {
+      selected = [...selected, ...iframe.contentWindow!.document.querySelectorAll<HTMLElement>(selector)];
+    }
+    return selected as T[];
+  }
+
+  private get tags(): Record<string, HTMLElement[]> {
+    let tags = window.top?.enhancerTags;
+    if (!tags) {
+      if (window.top) {
+        tags = {};
+        window.top.enhancerTags = tags;
+      }
+    }
+    return tags!;
+  }
 
   public init() {
-    this.initForms();
-    this.initTags();
-    this.initIntervals();
+    const iframes = document.querySelectorAll<HTMLIFrameElement>('iframe');
+    let loaded = 0;
+    if (iframes.length === 0) {
+      this.initForms();
+      this.initTags();
+      this.initIntervals();
+    }
+    for (const iframe of iframes) {
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      iframe.addEventListener('load', () => {
+        loaded += 1;
+        if (loaded === iframes.length) {
+          this.initForms();
+          this.initTags();
+          this.initIntervals();
+        }
+      });
+    }
   }
 
   public enableElement(element: HTMLElement) {
@@ -55,7 +96,7 @@ export default class Enhancer {
   }
 
   private initIntervals() {
-    const elements = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}interval]`);
+    const elements = Enhancer.selectAll<HTMLElement>(`[data-${Enhancer.prefix}interval]`);
     for (const element of elements) {
       const interval = parseInt(element.getAttribute(`data-${Enhancer.prefix}interval`) ?? '0', 10);
       if (interval > 0) {
@@ -67,14 +108,14 @@ export default class Enhancer {
   }
 
   private initForms() {
-    const forms = document.querySelectorAll<HTMLFormElement>(`form[data-${Enhancer.prefix}form]`);
+    const forms = Enhancer.selectAll<HTMLFormElement>(`form[data-${Enhancer.prefix}form]`);
     for (const form of forms) {
       this.forms.push(new EnhancedForm(this, form));
     }
   }
 
   private refreshForms() {
-    const formElements = document.querySelectorAll<HTMLFormElement>(`form[data-${Enhancer.prefix}form]`);
+    const formElements = Enhancer.selectAll<HTMLFormElement>(`form[data-${Enhancer.prefix}form]`);
     for (const form of formElements) {
       if (!this.forms.find((f) => f.form === form)) {
         this.forms.push(new EnhancedForm(this, form));
@@ -88,7 +129,7 @@ export default class Enhancer {
   }
 
   private initTags() {
-    const tags = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}tag]`);
+    const tags = Enhancer.selectAll<HTMLElement>(`[data-${Enhancer.prefix}tag]`);
     for (const tag of tags) {
       const tagName = tag.getAttribute(`data-${Enhancer.prefix}tag`) ?? '';
       if (!this.tags[tagName]) {
@@ -99,7 +140,7 @@ export default class Enhancer {
   }
 
   private refreshTags() {
-    const tagElements = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}tag]`);
+    const tagElements = Enhancer.selectAll<HTMLElement>(`[data-${Enhancer.prefix}tag]`);
     for (const element of tagElements) {
       const tagName = element.getAttribute(`data-${Enhancer.prefix}tag`) ?? '';
       if (!this.tags[tagName]) {
@@ -142,7 +183,7 @@ export default class Enhancer {
   }
 
   private refreshScrolls() {
-    const scrollElements = document.querySelectorAll<HTMLElement>(`[data-${Enhancer.prefix}scroll]`);
+    const scrollElements = Enhancer.selectAll<HTMLElement>(`[data-${Enhancer.prefix}scroll]`);
     for (const element of scrollElements) {
       const scroll = element.getAttribute(`data-${Enhancer.prefix}scroll`) ?? '';
       if (scroll === 'down') {

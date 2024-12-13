@@ -5,12 +5,16 @@
     data-enh-content="/sync/record/{{id}}"
     data-enh-tag="sync-record/{{id}}"
 >
-    <input type="hidden" name="id" value="{{id}}" />
-    <input name="from" placeholder="From" value="{{from}}" />
-    <button formaction="/sync/swap">Swap</button>
-    <input name="to" placeholder="To" value="{{to}}" />
-    <textarea name="description" placeholder="Description">{{description}}</textarea>
-    <span>Parent folder: {{parentFolder}}</span>
-    <button formaction="/sync/sync">Sync</button>
-    <button formaction="/sync/update" data-enh-changed data-enh-state>Save</button>
+    <div class="d-flex align-items-center pb-2">
+        <input type="hidden" name="id" value="{{id}}" />
+        <input name="from" placeholder="From" value="{{from}}" class="form-control" />
+        <button formaction="/sync/swap" class="btn btn-light"><i class="bi bi-arrow-left-right"></i></button>
+        <input name="to" placeholder="To" value="{{to}}" class="form-control" />
+    </div>
+    <div class="d-flex align-items-center pb-4 gap-2">
+        <input type="text" name="description" placeholder="Description" class="form-control" value="{{description}}"/>
+        <span class="text-nowrap">Parent folder: {{parentFolder}}</span>
+        <button formaction="/sync/sync" class="btn btn-primary">Sync</button>
+        <button formaction="/sync/update" data-enh-changed data-enh-state class="btn btn-primary">Save</button>
+    </div>
 </form>

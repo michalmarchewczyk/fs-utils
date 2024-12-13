@@ -77,6 +77,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
+  res.locals.path = req.path;
   res.locals.query = req.query;
   next();
 });
@@ -230,6 +231,15 @@ app.post('/sync/swap', async (req, res) => {
 
 app.get('/var', async (req, res) => {
   res.render('var', { state: getState() });
+});
+
+app.get('/var/record/:name', async (req, res) => {
+  const record = variablesManager.variables.find((v) => v.name === req.params.name);
+  const rendered = await hbs.render('src/views/partials/var-record.handlebars', {
+    layout: false,
+    ...record,
+  });
+  res.send(rendered);
 });
 
 app.post('/var/update', async (req, res) => {

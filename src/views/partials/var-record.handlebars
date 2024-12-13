@@ -1,11 +1,13 @@
 <form
     method="POST"
     data-enh-form
-    data-enh-reload="var-record/{{id}}"
-    data-enh-content="/var/record/{{id}}"
-    data-enh-tag="var-record/{{id}}"
+    data-enh-reload="var-record/{{name}} sync-records"
+    data-enh-content="/var/record/{{name}}"
+    data-enh-tag="var-record/{{name}}"
+    class="col-12 col-sm-6 col-md-4 col-xl-3 d-flex align-items-center"
 >
-    <span>Name: {{name}}</span>
-    <input name="value" placeholder="Value" value="{{value}}" />
-    <button formaction="update" data-enh-changed data-enh-state>Save</button>
+    <label class="form-label text-nowrap pe-4 mb-0" >Name: {{name}}</label>
+    <input type="hidden" name="name" value="{{name}}" />
+    <input name="value" placeholder="Value" value="{{value}}" class="form-control" />
+    <button formaction="/var/update" data-enh-changed data-enh-state class="btn btn-primary">Save</button>
 </form>

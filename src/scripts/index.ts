@@ -1,4 +1,6 @@
 import Enhancer from './enhancer';
 
-const enhancer = new Enhancer();
-enhancer.init();
+if (window === window.top) {
+  const enhancer = new Enhancer();
+  enhancer.init();
+}

@@ -1,9 +1,20 @@
-<div class="d-flex flex-column align-items-stretch h-100 w-100">
-
-<iframe src="/var?navbar=false"></iframe>
-
-<iframe src="/sync?navbar=false" class="flex-grow-1"></iframe>
-
-<iframe src="/logs?navbar=false" class="flex-grow-1"></iframe>
+<div class="d-flex flex-column align-items-stretch h-100 w-100 bg-primary gap-2 overflow-hidden">
+    <div class="d-flex flex-column gap-2 overflow-hidden" style="height: 600px; resize: vertical; max-height: calc(100% - 120px); min-height: 100px;">
+        <iframe
+            src="/var?navbar=false"
+            class="overflow-auto flex-shrink-0 flex-grow-0 bg-white"
+            style="height: 120px; resize: vertical; max-height: calc(100% - 100px); min-height: 40px;"
+        ></iframe>
+        <iframe
+            src="/sync?navbar=false"
+            class="overflow-auto flex-fill bg-white"
+            style="flex-basis: 40px !important; min-height: 40px;"
+        ></iframe>
+    </div>
+<iframe
+    src="/logs?navbar=false"
+    class="flex-fill bg-white"
+    style="min-height: 60px; flex-basis: 60px !important;"
+></iframe>
 
 </div>

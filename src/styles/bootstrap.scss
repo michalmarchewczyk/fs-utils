@@ -1,3 +1,6 @@
+$spacer: 0.5rem;
+$enable-rounded: false;
+
 @import "../../node_modules/bootstrap/scss/functions";
 @import "../../node_modules/bootstrap/scss/variables";
 @import "../../node_modules/bootstrap/scss/variables-dark";
@@ -8,3 +11,11 @@
 @import "../../node_modules/bootstrap/scss/reboot";
 @import "../../node_modules/bootstrap/scss/utilities";
 @import "../../node_modules/bootstrap/scss/utilities/api";
+@import "../../node_modules/bootstrap/scss/nav";
+@import "../../node_modules/bootstrap/scss/navbar";
+@import "../../node_modules/bootstrap/scss/buttons";
+@import "../../node_modules/bootstrap/scss/forms";
+@import "../../node_modules/bootstrap/scss/grid";
+@import "../../node_modules/bootstrap/scss/bootstrap-grid";
+
+@import "../../node_modules/bootstrap-icons/font/bootstrap-icons";

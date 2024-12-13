@@ -1,19 +1,42 @@
-<nav class="nav">
-    <ul>
-        <li class="nav-item">
-            <a class="nav-link" href="/">Home</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/sync/">Sync</a>
-        </li>
-        <li  class="nav-item">
-            <a class="nav-link" href="/var/">Variables</a>
-        </li>
-        <li  class="nav-item">
-            <a class="nav-link" href="/settings/">Settings</a>
-        </li>
-        <li  class="nav-item">
-            <a class="nav-link" href="/logs/">Logs</a>
-        </li>
-    </ul>
+<!--<nav class="nav navbar bg-primary">-->
+<!--    <ul>-->
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link" href="/">Home</a>-->
+<!--        </li>-->
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link" href="/sync/">Sync</a>-->
+<!--        </li>-->
+<!--        <li  class="nav-item">-->
+<!--            <a class="nav-link" href="/var/">Variables</a>-->
+<!--        </li>-->
+<!--        <li  class="nav-item">-->
+<!--            <a class="nav-link" href="/settings/">Settings</a>-->
+<!--        </li>-->
+<!--        <li  class="nav-item">-->
+<!--            <a class="nav-link" href="/logs/">Logs</a>-->
+<!--        </li>-->
+<!--    </ul>-->
+<!--</nav>-->
+
+<nav class="navbar navbar-expand bg-primary" data-bs-theme="dark">
+    <div class="container-fluid px-4 justify-content-start">
+        <a class="navbar-brand fw-bolder" href="/">fs-utils</a>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link {{#ifCond path '===' '/'}} active {{/ifCond}}" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{#ifCond path '===' '/sync/'}} active {{/ifCond}}" href="/sync/">Sync</a>
+            </li>
+            <li  class="nav-item">
+                <a class="nav-link {{#ifCond path '===' '/var/'}} active {{/ifCond}}" href="/var/">Variables</a>
+            </li>
+            <li  class="nav-item">
+                <a class="nav-link {{#ifCond path '===' '/settings/'}} active {{/ifCond}}" href="/settings/">Settings</a>
+            </li>
+            <li  class="nav-item">
+                <a class="nav-link {{#ifCond path '===' '/logs/'}} active {{/ifCond}}" href="/logs/">Logs</a>
+            </li>
+        </ul>
+    </div>
 </nav>
