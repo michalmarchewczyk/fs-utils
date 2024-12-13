@@ -222,6 +222,13 @@ app.post('/sync/update', async (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/sync/delete', async (req, res) => {
+  const id = req.body.id as string;
+  syncManager.deleteRecord(id);
+  await syncManager.saveToFile();
+  res.json({ success: true });
+});
+
 app.post('/sync/swap', async (req, res) => {
   const id = req.body.id as string;
   syncManager.swapRecord(id);

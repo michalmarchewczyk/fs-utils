@@ -36,7 +36,7 @@ export default class CopyFileQueue extends ProcessingQueue<CopyFileQueueItem> {
     const barLength = Math.max(120 - progress.length, 10);
     const barFill = Math.round((barLength * percent) / 100);
     const bar = `[${'#'.repeat(barFill)}${'-'.repeat(barLength - barFill)}]`;
-    return `${header}\n${progress} ${written !== 0 || done ? bar : ''}\n`;
+    return `\n${header}\n${progress} ${written !== 0 || done ? bar : ''}`;
   }
 
   protected async processItem({ source, destination, stat }: CopyFileQueueItem) {

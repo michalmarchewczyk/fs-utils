@@ -34,7 +34,9 @@ export default class EnhancedForm {
     const formData = new FormData(this.form);
     const method = this.form.getAttribute('method') ?? 'GET';
     let url = e.submitter?.getAttribute('formaction') ?? this.form.getAttribute('action') ?? '';
-    const reloadTags = this.form.getAttribute('data-enh-reload')?.split(' ') ?? [];
+    const formReloadTags = this.form.getAttribute('data-enh-reload')?.split(' ') ?? [];
+    const buttonReloadTags = e.submitter?.getAttribute('data-enh-reload')?.split(' ') ?? [];
+    const reloadTags = [...formReloadTags, ...buttonReloadTags];
 
     if (method === 'GET') {
       const query = new URLSearchParams();

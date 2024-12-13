@@ -18,6 +18,7 @@
     "start": "node dist/index.js",
     "start:watch": "nodemon dist/index.js --ignore data/",
     "dev": "npm run assets && concurrently \"npm run build:watch\" \"npm run styles:watch\" \"npm run start:watch\" --names \"BUILD,SASS,SERVER\" --prefix \"{time} [{name}]\"",
+    "prod": "npm run assets && npm run build && npm run styles && npm run start",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts"
   },

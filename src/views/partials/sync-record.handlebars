@@ -1,20 +1,21 @@
 <form
     method="POST"
     data-enh-form
-    data-enh-reload="sync-record/{{id}}"
+    data-enh-reload="sync-record/{{id}} var-records"
     data-enh-content="/sync/record/{{id}}"
     data-enh-tag="sync-record/{{id}}"
 >
     <div class="d-flex align-items-center pb-2">
         <input type="hidden" name="id" value="{{id}}" />
-        <input name="from" placeholder="From" value="{{from}}" class="form-control" />
-        <button formaction="/sync/swap" class="btn btn-light"><i class="bi bi-arrow-left-right"></i></button>
+        <input name="from" placeholder="From" value="{{from}}" class="form-control z-2" />
+        <button formaction="/sync/swap" class="btn btn-light" title="Switch"><i class="bi bi-arrow-left-right"></i></button>
         <input name="to" placeholder="To" value="{{to}}" class="form-control" />
     </div>
     <div class="d-flex align-items-center pb-4 gap-2">
+        <button formaction="/sync/delete" data-enh-reload="sync-records" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
         <input type="text" name="description" placeholder="Description" class="form-control" value="{{description}}"/>
-        <span class="text-nowrap">Parent folder: {{parentFolder}}</span>
-        <button formaction="/sync/sync" class="btn btn-primary">Sync</button>
-        <button formaction="/sync/update" data-enh-changed data-enh-state class="btn btn-primary">Save</button>
+        <span class="text-nowrap px-4">Parent folder: {{parentFolder}}</span>
+        <button formaction="/sync/sync" class="btn btn-primary" title="Sync"><i class="bi bi-arrow-repeat"></i></button>
+        <button formaction="/sync/update" data-enh-changed data-enh-state class="btn btn-primary" title="Save"><i class="bi bi-floppy"></i></button>
     </div>
 </form>

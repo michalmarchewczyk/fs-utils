@@ -76,6 +76,14 @@ export default class SyncManager {
     [record.from, record.to] = [record.to, record.from];
   }
 
+  deleteRecord(id: string) {
+    const record = this.records.find((r) => r.id === id);
+    if (!record) {
+      throw new Error('Record not found');
+    }
+    this.records = this.records.filter((r) => r.id !== id);
+  }
+
   getRecord(id: string) {
     return this.records.find((r) => r.id === id);
   }
