@@ -1,7 +1,7 @@
-import ProcessingQueue from './processing-queue';
+import ProcessingQueue from '../utils/processing-queue';
 import { copyFile } from 'copy-file';
-import Utils from './utils';
-import Logger from './logger';
+import Utils from '../utils/utils';
+import Logger from '../logger/logger';
 import { type Stats } from 'node:fs';
 const logger = Logger.getInstance();
 

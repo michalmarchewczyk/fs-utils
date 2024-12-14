@@ -1,4 +1,4 @@
-import Utils from '../utils';
+import Utils from '../utils/utils';
 
 const container = document.getElementById('logs')!;
 const logsTruncate = parseInt(container.dataset.truncate ?? '0', 10);

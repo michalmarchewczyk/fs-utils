@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import chokidar from 'chokidar';
 import globParent from 'glob-parent';
 import CopyFileQueue from './copy-file-queue';
-import DynamicString from './dynamic-string';
+import DynamicString from '../variables/dynamic-string';
 const copyFileQueue = CopyFileQueue.getInstance();
 
 export type SyncRecordDto = {
@@ -25,7 +25,7 @@ export default class SyncRecord {
     public autoSync = false,
   ) {}
 
-  sync() {
+  syncNow() {
     this.lastSync = new Date();
     const parentFolder = globParent(this.from.get());
     const watcher = chokidar.watch(this.from.get(), { persistent: false });
