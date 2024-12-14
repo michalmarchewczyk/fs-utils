@@ -5,6 +5,8 @@ export default abstract class ProcessingQueue<T> {
 
   protected abstract processItem(item: T): Promise<void>;
 
+  protected abstract onError(error: Error): void;
+
   public add(item: T) {
     this.queue.push(item);
     this.process();
@@ -21,9 +23,13 @@ export default abstract class ProcessingQueue<T> {
 
     this.current += 1;
     const item = this.queue.shift()!;
-    void this.processItem(item).finally(() => {
-      this.current -= 1;
-      this.process();
-    });
+    void this.processItem(item)
+      .catch((e: Error) => {
+        this.onError(e);
+      })
+      .finally(() => {
+        this.current -= 1;
+        this.process();
+      });
   }
 }

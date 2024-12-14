@@ -21,7 +21,7 @@ export default class Logger extends EventEmitter {
   private static readonly filePath = path.join(
     __dirname,
     './data/logs/',
-    new Date().toISOString().replace(/[:\-.T]/g, '-') + '.json',
+    new Date().toISOString().replace(/[:\-.T]/g, '-') + '.log',
   );
 
   public logs: Record<string, Log> = {};
@@ -58,7 +58,7 @@ export default class Logger extends EventEmitter {
   }
 
   private static serializeLog(log: Log) {
-    return `${log.date.toISOString()} ${log.message}`;
+    return `${log.date.toISOString()} [${log.type.toUpperCase()}] ${log.message}`;
   }
 
   private static serializeLogToHtml(log: Log) {
