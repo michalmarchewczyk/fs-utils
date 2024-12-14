@@ -1,5 +1,7 @@
-<div class="p-4 w-100 h-100 overflow-auto">
-    {{#each state.settingsList}}
-        {{> setting}}
-    {{/each}}
+<div class="p-4 overflow-auto mx-auto container row gx-4 gy-4">
+    <div class="mx-auto col-12 col-md-9 col-lg-6 col-xl-5">
+        {{#each state.settingsList}}
+            {{> setting}}
+        {{/each}}
+    </div>
 </div>

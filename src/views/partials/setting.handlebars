@@ -1,24 +1,25 @@
-<form method="post" data-enh-form>
-    <label>
-        {{key}} ({{type}}) <span class="d-none" data-enh-changed>* </span>:
+<form method="post" data-enh-form class="d-flex align-items-center gap-4 mt-2 mb-5">
+    <label class="d-flex  align-items-center text-nowrap flex-fill gap-4">
+        <span class="text-nowrap">{{key}} ({{type}}): </span>
+        <span class="d-none" data-enh-changed>* </span>
         {{#switch type}}
             {{#case "boolean"}}
-                <select name="value">
+                <select name="value" class="form-select flex-fill">
                     <option value="true" {{#ifCond value '===' 'true'}}selected{{/ifCond}}>true</option>
                     <option value="false" {{#ifCond value '!==' 'true'}}selected{{/ifCond}}>false</option>
                 </select>
             {{/case}}
             {{#case "number"}}
-                <input type="number" name="value" value="{{value}}" />
+                <input type="number" name="value" value="{{value}}" class="form-control flex-fill"/>
             {{/case}}
             {{#case "string"}}
-                <input type="text" name="value" value="{{value}}" />
+                <input type="text" name="value" value="{{value}}" class="form-control flex-fill" />
             {{/case}}
         {{/switch}}
     </label>
     <input type="hidden" name="key" value="{{key}}" />
     <input type="hidden" name="type" value="{{type}}" />
-    <input type="submit" value="Save" data-enh-ready data-enh-state/>
-    <span class="d-none" data-enh-loading>Loading...</span>
-    <span data-enh-ready>Saved</span>
+    <input type="submit" value="Save" data-enh-ready data-enh-state class="btn btn-primary"/>
+<!--    <span class="d-none" data-enh-loading>Loading...</span>-->
+<!--    <span data-enh-ready>Saved</span>-->
 </form>
