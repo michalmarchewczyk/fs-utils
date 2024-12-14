@@ -25,6 +25,9 @@ export const initState = async () => {
 
   void syncManager.createFile().then(() => {
     console.log('Initialized sync file');
+    void syncManager.loadFromFile().then(() => {
+      console.log('Loaded sync from file');
+    });
   });
 
   void variablesManager.createFile().then(() => {

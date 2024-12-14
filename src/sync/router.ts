@@ -21,15 +21,6 @@ router.get('/record/:id', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  try {
-    if (!syncManager.loaded) {
-      await syncManager.loadFromFile();
-    }
-  } catch (e: any) {
-    res.render('error', { error: e.message as string });
-    return;
-  }
-
   res.render('sync', { state: getState() });
 });
 

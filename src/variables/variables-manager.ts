@@ -2,6 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import type VariablesConsumer from './variables-consumer';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -14,6 +15,7 @@ export default class VariablesManager {
   private static instance: VariablesManager;
   public loaded = false;
   private readonly filePath = path.join(__dirname, './data/vars.json');
+  private readonly consumers: VariablesConsumer[] = [];
 
   public static getInstance() {
     if (!VariablesManager.instance) {
@@ -54,6 +56,10 @@ export default class VariablesManager {
     }
   }
 
+  addConsumer(consumer: VariablesConsumer) {
+    this.consumers.push(consumer);
+  }
+
   public variables: Variable[] = [];
 
   public addVariable(name: string, value: string) {
@@ -79,5 +85,11 @@ export default class VariablesManager {
     if (!this.variables.find((variable) => variable.name === name)) {
       this.addVariable(name, value);
     }
+  }
+
+  public clearVariables() {
+    const usedVariableNames = this.consumers.flatMap((consumer) => consumer.variableNames);
+    this.variables = this.variables.filter((variable) => usedVariableNames.includes(variable.name));
+    void this.saveToFile();
   }
 }

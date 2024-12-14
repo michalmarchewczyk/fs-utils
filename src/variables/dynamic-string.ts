@@ -26,7 +26,7 @@ export default class DynamicString extends VariablesConsumer {
 
   public set(value: string) {
     this.value = value;
-    const variableNames = DynamicString.getVariableNames(value);
-    this.refreshVariables(variableNames);
+    this.variableNames = DynamicString.getVariableNames(value);
+    this.refreshVariables();
   }
 }

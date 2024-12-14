@@ -27,4 +27,9 @@ router.post('/update', async (req, res) => {
   res.json({ success: true });
 });
 
+router.post('/clear', async (req, res) => {
+  variablesManager.clearVariables();
+  res.json({ success: true });
+});
+
 export default router;
