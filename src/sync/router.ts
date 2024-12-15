@@ -42,14 +42,27 @@ router.post('/sync', async (req, res) => {
     res.json({ success: false });
     return;
   }
-  record.syncNow();
+  record.syncOnce();
   res.json({ success: true });
 });
 
 router.post('/update', async (req, res) => {
   const dto = req.body as SyncRecordDto;
-  const record = SyncRecord.fromDto(dto);
+  const record = SyncRecord.fromDto({ ...dto, autoSync: req.body.autoSync === 'on' });
   syncManager.replaceRecord(record);
+  await syncManager.saveToFile();
+  res.json({ success: true });
+});
+
+router.post('/duplicate', async (req, res) => {
+  const dto = {
+    to: req.body.to as string,
+    from: req.body.from as string,
+    autoSync: req.body.autoSync === 'on',
+    description: req.body.description as string,
+  } as SyncRecordDto;
+  const record = SyncRecord.fromDto(dto);
+  syncManager.addRecord(record);
   await syncManager.saveToFile();
   res.json({ success: true });
 });

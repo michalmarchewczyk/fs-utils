@@ -78,7 +78,6 @@ export default class CopyFileQueue extends ProcessingQueue<CopyFileQueueItem> {
                 reject(e);
               });
           } else {
-            replace(log, `Error: ${e.message}`);
             reject(e);
           }
         });
