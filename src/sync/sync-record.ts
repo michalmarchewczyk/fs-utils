@@ -44,7 +44,7 @@ export default class SyncRecord {
 
   syncOnce() {
     const parentFolder = globParent(this.from.get());
-    const watcher = chokidar.watch(this.from.get(), { persistent: false });
+    const watcher = chokidar.watch(this.from.get(), { persistent: false, usePolling: true });
     watcher.on('all', (event, path, stat) => {
       this.syncFile(path, parentFolder, stat);
     });
@@ -58,7 +58,7 @@ export default class SyncRecord {
       return;
     }
     const parentFolder = globParent(this.from.get());
-    this.syncWatcher = chokidar.watch(this.from.get(), { persistent: true, ignoreInitial: true });
+    this.syncWatcher = chokidar.watch(this.from.get(), { persistent: true, ignoreInitial: true, usePolling: true });
     this.syncWatcher.on('all', (event, path, stat) => {
       if (event === 'unlink' || event === 'unlinkDir') {
         return;
