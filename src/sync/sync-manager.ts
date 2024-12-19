@@ -84,6 +84,32 @@ export default class SyncManager {
     this.records = this.records.filter((r) => r.id !== id);
   }
 
+  moveRecordUp(id: string) {
+    const record = this.records.find((r) => r.id === id);
+    if (!record) {
+      throw new Error('Record not found');
+    }
+    const index = this.records.indexOf(record);
+    if (index === 0) {
+      return;
+    }
+    this.records.splice(index, 1);
+    this.records.splice(index - 1, 0, record);
+  }
+
+  moveRecordDown(id: string) {
+    const record = this.records.find((r) => r.id === id);
+    if (!record) {
+      throw new Error('Record not found');
+    }
+    const index = this.records.indexOf(record);
+    if (index === this.records.length - 1) {
+      return;
+    }
+    this.records.splice(index, 1);
+    this.records.splice(index + 1, 0, record);
+  }
+
   getRecord(id: string) {
     return this.records.find((r) => r.id === id);
   }

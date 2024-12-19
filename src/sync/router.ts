@@ -83,4 +83,18 @@ router.post('/swap', async (req, res) => {
   res.json({ success: true });
 });
 
+router.post('/moveup', async (req, res) => {
+  const id = req.body.id as string;
+  syncManager.moveRecordUp(id);
+  await syncManager.saveToFile();
+  res.json({ success: true });
+});
+
+router.post('/movedown', async (req, res) => {
+  const id = req.body.id as string;
+  syncManager.moveRecordDown(id);
+  await syncManager.saveToFile();
+  res.json({ success: true });
+});
+
 export default router;
