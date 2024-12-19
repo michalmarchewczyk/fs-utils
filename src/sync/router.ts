@@ -3,6 +3,7 @@ import { getState } from '../state';
 import SyncRecord, { type SyncRecordDto } from './sync-record';
 import SyncManager from './sync-manager';
 import hbs from '../hbs';
+import Utils from '../utils/utils';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -43,6 +44,7 @@ router.post('/sync', async (req, res) => {
     return;
   }
   record.syncOnce();
+  await Utils.sleep(1000);
   res.json({ success: true });
 });
 

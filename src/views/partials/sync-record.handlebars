@@ -23,7 +23,7 @@
             <input class="form-check-input" type="checkbox" role="switch" id="autoSync_{{id}}" {{#ifCond autoSync '===' true}} checked {{/ifCond}} name="autoSync">
             <label class="form-check-label text-nowrap" for="autoSync_{{id}}">Auto sync</label>
         </div>
-        <button formaction="/sync/sync" class="btn btn-primary" title="Sync"><i class="bi bi-arrow-repeat"></i></button>
+        <button formaction="/sync/sync" data-enh-ready data-enh-state class="btn btn-primary" title="Sync"><i class="bi bi-arrow-repeat"></i></button>
         <button formaction="/sync/update" data-enh-changed data-enh-state class="btn btn-primary" title="Save"><i class="bi bi-floppy"></i></button>
     </div>
 </form>
