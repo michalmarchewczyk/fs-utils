@@ -45,4 +45,8 @@ export default class Utils {
       setTimeout(resolve, ms);
     });
   }
+
+  public static trim(text: string, char: string) {
+    return text.replace(new RegExp(`^${char}+|${char}+$`, 'g'), '');
+  }
 }

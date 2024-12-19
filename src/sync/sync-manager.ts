@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 export default class SyncManager {
   private static instance: SyncManager;
   public loaded = false;
-  private readonly filePath = path.join(__dirname, './data/sync.json');
+  private static readonly filePath = path.join(__dirname, './data/sync.json');
   public records: SyncRecord[] = [];
 
   public static getInstance() {
@@ -22,19 +22,24 @@ export default class SyncManager {
 
   private constructor() {}
 
+  public async getPathForBackup() {
+    await this.saveToFile();
+    return SyncManager.filePath;
+  }
+
   public async saveToFile() {
-    await fs.mkdir(path.dirname(this.filePath), { recursive: true });
+    await fs.mkdir(path.dirname(SyncManager.filePath), { recursive: true });
     const data = JSON.stringify(
       this.records.map((r) => r.toDto()),
       null,
       2,
     );
-    await fs.writeFile(this.filePath, data, { encoding: 'utf-8' });
+    await fs.writeFile(SyncManager.filePath, data, { encoding: 'utf-8' });
   }
 
   public async createFile() {
     try {
-      await fs.access(this.filePath);
+      await fs.access(SyncManager.filePath);
     } catch (e) {
       await this.saveToFile();
     }
@@ -42,7 +47,7 @@ export default class SyncManager {
 
   public async loadFromFile() {
     try {
-      const data = await fs.readFile(this.filePath, { encoding: 'utf-8' });
+      const data = await fs.readFile(SyncManager.filePath, { encoding: 'utf-8' });
       const syncRecordsDtos = JSON.parse(data) as SyncRecordDto[];
 
       this.records = [];

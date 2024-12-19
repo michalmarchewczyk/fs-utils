@@ -14,7 +14,7 @@ export type Variable = {
 export default class VariablesManager {
   private static instance: VariablesManager;
   public loaded = false;
-  private readonly filePath = path.join(__dirname, './data/vars.json');
+  private static readonly filePath = path.join(__dirname, './data/vars.json');
   private readonly consumers: VariablesConsumer[] = [];
 
   public static getInstance() {
@@ -26,15 +26,20 @@ export default class VariablesManager {
 
   private constructor() {}
 
+  public async getPathForBackup() {
+    await this.saveToFile();
+    return VariablesManager.filePath;
+  }
+
   public async saveToFile() {
-    await fs.mkdir(path.dirname(this.filePath), { recursive: true });
+    await fs.mkdir(path.dirname(VariablesManager.filePath), { recursive: true });
     const data = JSON.stringify(this.variables, null, 2);
-    await fs.writeFile(this.filePath, data, { encoding: 'utf-8' });
+    await fs.writeFile(VariablesManager.filePath, data, { encoding: 'utf-8' });
   }
 
   public async createFile() {
     try {
-      await fs.access(this.filePath);
+      await fs.access(VariablesManager.filePath);
     } catch (e) {
       await this.saveToFile();
     }
@@ -42,7 +47,7 @@ export default class VariablesManager {
 
   public async loadFromFile() {
     try {
-      const data = await fs.readFile(this.filePath, { encoding: 'utf-8' });
+      const data = await fs.readFile(VariablesManager.filePath, { encoding: 'utf-8' });
       const variables = JSON.parse(data) as Variable[];
 
       this.variables = [];

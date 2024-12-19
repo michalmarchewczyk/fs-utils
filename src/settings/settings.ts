@@ -33,6 +33,11 @@ export default class Settings extends EventEmitter {
     super();
   }
 
+  public async getPathForBackup() {
+    await this.saveToFile();
+    return Settings.filePath;
+  }
+
   public async saveToFile() {
     await fs.mkdir(path.dirname(Settings.filePath), { recursive: true });
     const data = JSON.stringify(this, null, 2);

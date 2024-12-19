@@ -1,4 +1,5 @@
 import type Enhancer from './enhancer';
+import Utils from '../utils/utils';
 
 export default class EnhancedForm {
   constructor(
@@ -57,6 +58,21 @@ export default class EnhancedForm {
         'X-Enhanced-Form': 'true',
       },
     });
+
+    const isAttachment = res.headers.get('Content-Disposition')?.includes('attachment');
+
+    if (isAttachment) {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      let fileName = res.headers.get('Content-Disposition')?.split('filename=')[1] ?? 'file';
+      fileName = Utils.trim(fileName, '"');
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
 
     const isJson = res.headers.get('Content-Type')?.includes('application/json');
 
