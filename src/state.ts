@@ -42,7 +42,7 @@ export const getState = () => ({
   settings,
   settingsList: settings.toDto(),
   syncRecords: syncManager.records.map((r) => ({ ...r.toDto(), parentFolder: r.parentFolder })),
-  varRecords: variablesManager.variables,
+  varRecords: variablesManager.variables.sort((a, b) => a.name.localeCompare(b.name)),
   logs: logger.getLogs(settings.logsTruncate),
   logsHtml: logger.toHtml(settings.logsTruncate),
 });
