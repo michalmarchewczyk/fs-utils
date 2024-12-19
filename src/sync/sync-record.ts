@@ -13,11 +13,13 @@ export type SyncRecordDto = {
   autoSync: boolean;
   lastSync: string;
   description?: string;
+  color?: string;
 };
 
 export default class SyncRecord {
   public id: string = randomUUID();
   public description = '';
+  public color = '#ffffff';
   private _autoSync = false;
   public lastSync = new Date(0);
   private syncWatcher: chokidar.FSWatcher | null = null;
@@ -98,6 +100,7 @@ export default class SyncRecord {
       autoSync: this.autoSync,
       lastSync: this.lastSync.toISOString(),
       description: this.description,
+      color: this.color,
     };
   }
 
@@ -106,6 +109,7 @@ export default class SyncRecord {
     syncRecord.lastSync = new Date(dto.lastSync ?? 0);
     syncRecord.id = dto.id ?? randomUUID();
     syncRecord.description = dto.description ?? '';
+    syncRecord.color = dto.color ?? '#ffffff';
     return syncRecord;
   }
 }

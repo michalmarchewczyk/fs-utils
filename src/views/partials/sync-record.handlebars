@@ -4,7 +4,9 @@
     data-enh-reload="sync-record/{{id}} var-records"
     data-enh-content="/sync/record/{{id}}"
     data-enh-tag="sync-record/{{id}}"
+    class="position-relative"
 >
+    <div style="position: absolute; height: 100%; left: -12px; right: -12px; top: -6px; z-index: -1; background: {{color}}; opacity: 0.4;"></div>
     <div class="d-flex align-items-center pb-2">
         <input type="hidden" name="id" value="{{id}}" />
         <input name="from" placeholder="From" value="{{from}}" class="form-control z-2 fw-semibold text-black" />
@@ -12,6 +14,7 @@
         <input name="to" placeholder="To" value="{{to}}" class="form-control fw-semibold text-black" />
     </div>
     <div class="d-flex align-items-center pb-4 gap-2">
+        <input type="color" class="form-control px-3 flex-shrink-0" value="{{color}}" name="color" style="width: 40px; height: 37px;"/>
         <button formaction="/sync/delete" data-enh-reload="sync-records" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
         <button formaction="/sync/duplicate" data-enh-reload="sync-records" class="btn btn-outline-primary" title="Duplicate"><i class="bi bi-copy"></i></button>
         <input type="text" name="description" placeholder="Description" class="form-control" value="{{description}}"/>
