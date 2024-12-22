@@ -5,6 +5,12 @@ import Logger from '../logger/logger';
 import { type Stats } from 'node:fs';
 import Settings from '../settings/settings';
 import fs from 'node:fs/promises';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'node:path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const logger = Logger.getInstance();
 
 const settings = Settings.getInstance();
@@ -19,6 +25,7 @@ export type CopyFileQueueItem = {
 export default class CopyFileQueue extends ProcessingQueue<CopyFileQueueItem> {
   protected maxConcurrency = 20;
   private static instance: CopyFileQueue;
+  private static readonly protectedPaths = [path.join(__dirname, './data/')];
   private renameCounter = 1;
 
   private constructor() {
@@ -53,6 +60,12 @@ export default class CopyFileQueue extends ProcessingQueue<CopyFileQueueItem> {
     return new Promise<void>((resolve, reject) => {
       const log = logger.log(CopyFileQueue.getLogMessage(source, destination, 0, stat?.size ?? 0));
       const replace = Utils.throttle((id: string, msg: string) => logger.replaceLog(id, msg), 200);
+      for (const protectedPath of CopyFileQueue.protectedPaths) {
+        if (path.normalize(source).startsWith(path.normalize(protectedPath))) {
+          reject(new Error(`Source path is protected: ${source}`));
+          return;
+        }
+      }
       copyFile(source, destination, {
         onProgress(info) {
           replace(log, CopyFileQueue.getLogMessage(source, destination, info.writtenBytes, info.size));
