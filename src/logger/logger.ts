@@ -17,7 +17,7 @@ export type Log = {
 
 export default class Logger extends EventEmitter {
   private static instance: Logger;
-  public static readonly logToConsole = false;
+  public static readonly logToConsole = true;
   private static readonly filePath = path.join(
     __dirname,
     './data/logs/',

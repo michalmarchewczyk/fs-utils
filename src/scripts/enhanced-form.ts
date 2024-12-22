@@ -74,13 +74,36 @@ export default class EnhancedForm {
       return;
     }
 
-    const isJson = res.headers.get('Content-Type')?.includes('application/json');
+    const isRedirect = res.redirected;
 
-    const data = isJson ? ((await res.json()) as Record<string, unknown>) : await res.text();
+    if (isRedirect) {
+      window.location.href = res.headers.get('Location') ?? res.url ?? '';
+      return;
+    }
+
+    const isJson = res.headers.get('Content-Type')?.includes('application/json');
 
     if (!isJson) {
       window.location.reload();
       return;
+    }
+
+    const data = (await res.json()) as Record<string, unknown>;
+
+    if (data.error) {
+      for (const [key, value] of Object.entries(data.error) as Array<[string, string]>) {
+        const field = this.form.querySelector<HTMLInputElement>(`[name="${key}"]`);
+        if (field) {
+          field.classList.add('is-invalid');
+          let errorElement = field.nextElementSibling;
+          if (!errorElement || !errorElement.classList.contains('invalid-feedback')) {
+            errorElement = document.createElement('div');
+            errorElement.classList.add('invalid-feedback');
+          }
+          errorElement.textContent = value;
+          field.after(errorElement);
+        }
+      }
     }
 
     for (const tag of reloadTags) {

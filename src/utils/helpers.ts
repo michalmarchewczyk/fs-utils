@@ -29,6 +29,8 @@ const helpers: UnknownObject = {
         return v1 && v2 ? options.fn(this) : options.inverse(this);
       case '||':
         return v1 || v2 ? options.fn(this) : options.inverse(this);
+      case 'startsWith':
+        return v1.startsWith(v2) ? options.fn(this) : options.inverse(this);
       default:
         return options.inverse(this);
     }

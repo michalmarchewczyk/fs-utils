@@ -1,0 +1,23 @@
+<div class="p-4 overflow-auto mx-auto container row gx-4 gy-4 h-100 overflow-hidden">
+    <form class="mx-auto col-12 col-md-9 col-lg-6 col-xl-5 d-flex flex-column gap-4 h-100 justify-content-center px-4"
+          data-enh-form
+          action="/auth/login"
+          method="POST">
+        <h2 class="text-center fs-2 fw-bold mb-5">Login</h2>
+        {{#ifCond query.msg '!==' undefined}}
+            <div class="alert alert-success" role="alert">
+                {{query.msg}}
+            </div>
+        {{/ifCond}}
+        {{#ifCond query.err '!==' undefined}}
+            <div class="alert alert-danger" role="alert">
+                {{query.err}}
+            </div>
+        {{/ifCond}}
+        <label class="form-label">
+            <span>Password</span>
+            <input type="password" name="password" class="form-control"/>
+        </label>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>

@@ -9,7 +9,10 @@
 
 <div class="w-100 h-100 d-flex flex-column">
     {{#ifCond query.navbar '!==' 'false' }}
-        {{> navbar}}
+        {{#ifCond path 'startsWith' '/auth' }}
+        {{else}}
+            {{> navbar}}
+        {{/ifCond}}
     {{/ifCond}}
 
     <div class="w-100 h-100 overflow-hidden flex-fill {{#ifCond query.navbar '!==' 'false' }} border border-4 border-primary {{/ifCond}}">
