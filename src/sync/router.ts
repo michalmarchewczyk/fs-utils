@@ -62,6 +62,7 @@ router.post('/duplicate', async (req, res) => {
     from: req.body.from as string,
     autoSync: req.body.autoSync === 'on',
     description: req.body.description as string,
+    color: req.body.color as string,
   } as SyncRecordDto;
   const record = SyncRecord.fromDto(dto);
   syncManager.addRecord(record);
