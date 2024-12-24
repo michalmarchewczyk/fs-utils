@@ -48,8 +48,8 @@ export default class CopyFileQueue extends ProcessingQueue<CopyFileQueueItem> {
     const progress = `(${Utils.humanizeSize(written)}/${Utils.humanizeSize(size)}) ${percent}%`;
     const barLength = Math.max(120 - progress.length, 10);
     const barFill = Math.round((barLength * percent) / 100);
-    const bar = `[${'#'.repeat(barFill)}${'-'.repeat(barLength - barFill)}]`;
-    return `\n${header}\n${progress} ${written !== 0 || done ? bar : ''}`;
+    const bar = `[${'#'.repeat(barFill)}${'-'.repeat(barLength - barFill)}] ${done ? 'Done' : ''}`;
+    return `\n${header}\n${progress} ${written !== 0 || done ? bar : 'Starting...'}`;
   }
 
   protected onError(error: Error) {
@@ -59,7 +59,10 @@ export default class CopyFileQueue extends ProcessingQueue<CopyFileQueueItem> {
   protected async processItem({ source, destination, stat, preventRename }: CopyFileQueueItem) {
     return new Promise<void>((resolve, reject) => {
       const log = logger.log(CopyFileQueue.getLogMessage(source, destination, 0, stat?.size ?? 0));
-      const replace = Utils.throttle((id: string, msg: string) => logger.replaceLog(id, msg), 200);
+      const replace = Utils.throttle(
+        (id: string, msg: string, final = false) => logger.replaceLog(id, msg, final),
+        200,
+      );
       for (const protectedPath of CopyFileQueue.protectedPaths) {
         if (path.normalize(source).startsWith(path.normalize(protectedPath))) {
           reject(new Error(`Source path is protected: ${source}`));
@@ -72,7 +75,7 @@ export default class CopyFileQueue extends ProcessingQueue<CopyFileQueueItem> {
         },
       })
         .then(() => {
-          replace(log, CopyFileQueue.getLogMessage(source, destination, stat?.size, stat?.size, true));
+          replace(log, CopyFileQueue.getLogMessage(source, destination, stat?.size, stat?.size, true), true);
           resolve();
         })
         .catch((e) => {

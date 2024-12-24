@@ -107,12 +107,18 @@ export default class Logger extends EventEmitter {
     return log.id;
   }
 
-  public replaceLog(id: string, newMessage: string) {
+  public replaceLog(id: string, newMessage: string, final = false) {
     const log = this.logs[id];
     if (!log) {
       throw new Error('Log not found');
     }
     log.message = newMessage;
     this.emit('replaceLog', log);
+    if (final) {
+      void this.appendToFile(log);
+      if (Logger.logToConsole) {
+        console.log(Logger.serializeLog(log));
+      }
+    }
   }
 }
