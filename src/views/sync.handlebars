@@ -1,7 +1,12 @@
-<div class="p-4 w-100 h-100 overflow-auto">
-    <input type="text" data-enh-filter-value="sync-records"/>
-    <div data-enh-tag="sync-records" data-enh-partial="sync-records" data-enh-filter-refresh="sync-records">
-        {{> sync-records }}
+<div class="w-100 h-100 overflow-auto">
+    <div class="position-sticky top-0 bg-white d-flex gap-4 align-items-center p-4 py-3 border-bottom border-secondary z-3">
+        <span>Filter: </span>
+        <input type="text" data-enh-filter-value="sync-records" class="form-control flex-grow-1"/>
     </div>
-    {{> create-sync-record }}
+    <div class="p-4">
+        <div data-enh-tag="sync-records" data-enh-partial="sync-records" data-enh-filter-refresh="sync-records">
+            {{> sync-records }}
+        </div>
+        {{> create-sync-record }}
+    </div>
 </div>
