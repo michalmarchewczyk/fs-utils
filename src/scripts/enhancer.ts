@@ -39,6 +39,7 @@ export default class Enhancer {
       this.initForms();
       this.initTags();
       this.initIntervals();
+      this.initFilters();
     }
     for (const iframe of iframes) {
       // eslint-disable-next-line @typescript-eslint/no-loop-func
@@ -48,6 +49,7 @@ export default class Enhancer {
           this.initForms();
           this.initTags();
           this.initIntervals();
+          this.initFilters();
         }
       });
     }
@@ -105,6 +107,40 @@ export default class Enhancer {
         }, interval);
       }
     }
+  }
+
+  private initFilters() {
+    let filters = Enhancer.selectAll<HTMLInputElement>(`[data-${Enhancer.prefix}filter-value]`).map((el) =>
+      el.getAttribute(`data-${Enhancer.prefix}filter-value`),
+    );
+    filters = [...new Set(filters)];
+    for (const filter of filters) {
+      const valueEl = Enhancer.selectAll<HTMLInputElement>(`[data-${Enhancer.prefix}filter-value="${filter}"]`)[0];
+      if (!valueEl) {
+        continue;
+      }
+      valueEl.oninput = () => {
+        const elements = Enhancer.selectAll<HTMLElement>(`[data-${Enhancer.prefix}filter="${filter}"]`);
+        const values = valueEl.value.split('|');
+        for (const element of elements) {
+          if (values.length === 0 || (values.length === 1 && values[0] === '')) {
+            this.enableElement(element);
+            continue;
+          }
+          const elementValue = element.getAttribute(`data-${Enhancer.prefix}filter-content`) ?? '';
+          if (values.some((v) => elementValue.includes(v))) {
+            this.enableElement(element);
+          } else {
+            this.disableElement(element);
+          }
+        }
+      };
+      valueEl.oninput(new Event('input'));
+    }
+  }
+
+  private refreshFilters() {
+    this.initFilters();
   }
 
   private initForms() {
@@ -173,6 +209,7 @@ export default class Enhancer {
             this.refreshForms();
             this.refreshTags();
             this.forms.filter((f) => f.form.contains(element)).forEach((f) => f.refresh());
+            this.refreshFilters();
             this.refreshScrolls();
           })
           .catch((e) => {
