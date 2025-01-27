@@ -9,10 +9,10 @@ const authMiddleware = async (req: express.Request, res: express.Response, next:
     res.redirect('/auth/set-password');
     return;
   }
-  // If (!req.session.loggedIn) {
-  //   res.redirect('/auth/login');
-  //   return;
-  // }
+  if (!req.session.loggedIn) {
+    res.redirect('/auth/login');
+    return;
+  }
   next();
 };
 
