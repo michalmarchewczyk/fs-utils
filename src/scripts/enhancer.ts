@@ -128,7 +128,7 @@ export default class Enhancer {
             continue;
           }
           const elementValue = element.getAttribute(`data-${Enhancer.prefix}filter-content`) ?? '';
-          if (values.some((v) => elementValue.includes(v))) {
+          if (values.some((v) => elementValue.toLowerCase().includes(v.toLowerCase()))) {
             this.enableElement(element);
           } else {
             this.disableElement(element);
