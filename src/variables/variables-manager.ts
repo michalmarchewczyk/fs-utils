@@ -9,6 +9,7 @@ const __dirname = dirname(__filename);
 export type Variable = {
   name: string;
   value: string;
+  recentValues: string[];
 };
 
 export default class VariablesManager {
@@ -68,7 +69,7 @@ export default class VariablesManager {
   public variables: Variable[] = [];
 
   public addVariable(name: string, value: string) {
-    this.variables.push({ name, value });
+    this.variables.push({ name, value, recentValues: [value] });
     void this.saveToFile();
   }
 
@@ -80,6 +81,11 @@ export default class VariablesManager {
     const variable = this.variables.find((variable) => variable.name === name);
     if (variable) {
       variable.value = value;
+      variable.recentValues = variable.recentValues.filter((v) => v !== value);
+      variable.recentValues.push(value);
+      if (variable.recentValues.length > 20) {
+        variable.recentValues.shift();
+      }
     } else {
       this.addVariable(name, value);
     }

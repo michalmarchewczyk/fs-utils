@@ -13,3 +13,7 @@ html, body {
   width: 100%;
   overflow: hidden;
 }
+
+input::-webkit-calendar-picker-indicator {
+  display: none !important;
+}

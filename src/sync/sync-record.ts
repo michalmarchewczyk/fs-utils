@@ -37,8 +37,8 @@ export default class SyncRecord {
   }
 
   public set autoSync(value: boolean) {
-    this._autoSync = value;
     this.stopAutoSync();
+    this._autoSync = value;
     if (value) {
       this.startAutoSync();
     }

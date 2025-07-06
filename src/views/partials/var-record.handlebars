@@ -8,6 +8,13 @@
 >
     <label class="form-label text-nowrap pe-4 mb-0" >Name: {{name}}</label>
     <input type="hidden" name="name" value="{{name}}" />
-    <input name="value" placeholder="Value" value="{{value}}" class="form-control fw-semibold text-black" />
+    <input name="value" placeholder="Value" value="{{value}}" class="form-control fw-semibold text-black" list="var-datalist-{{name}}"/>
     <button formaction="/var/update" data-enh-changed data-enh-state class="btn btn-primary" title="Save"><i class="bi bi-floppy"></i></button>
+    {{#if recentValues.length}}
+        <datalist id="var-datalist-{{name}}">
+            {{#each recentValues}}
+                <option value="{{this}}">{{this}}</option>
+            {{/each}}
+        </datalist>
+    {{/if}}
 </form>
