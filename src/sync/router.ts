@@ -50,8 +50,8 @@ router.post('/sync', async (req, res) => {
 
 router.post('/update', async (req, res) => {
   const dto = req.body as SyncRecordDto;
-  const record = SyncRecord.fromDto({ ...dto, autoSync: req.body.autoSync === 'on' });
-  syncManager.replaceRecord(record);
+  const record = { ...dto, autoSync: req.body.autoSync === 'on' };
+  syncManager.modifyRecord(record);
   await syncManager.saveToFile();
   res.json({ success: true });
 });

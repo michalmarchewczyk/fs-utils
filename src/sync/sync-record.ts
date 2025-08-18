@@ -4,7 +4,9 @@ import chokidar from 'chokidar';
 import globParent from 'glob-parent';
 import CopyFileQueue from './copy-file-queue';
 import DynamicString from '../variables/dynamic-string';
+import Logger from '../logger/logger';
 const copyFileQueue = CopyFileQueue.getInstance();
+const logger = Logger.getInstance();
 
 export type SyncRecordDto = {
   id?: string;
@@ -32,11 +34,20 @@ export default class SyncRecord {
     this.autoSync = autoSync;
   }
 
+  public modify(newData: SyncRecordDto) {
+    this.from = new DynamicString(newData.from);
+    this.to = new DynamicString(newData.to);
+    this.description = newData.description ?? '';
+    this.color = newData.color ?? '#ffffff';
+    this.autoSync = newData.autoSync;
+  }
+
   public get autoSync() {
     return this._autoSync;
   }
 
   public set autoSync(value: boolean) {
+    console.log('SET AUTO SYNC', this.from.get(), value, this.syncWatcher !== null);
     this.stopAutoSync();
     this._autoSync = value;
     if (value) {
@@ -59,6 +70,7 @@ export default class SyncRecord {
     if (!this.autoSync || this.syncWatcher) {
       return;
     }
+    logger.log(`Started syncing ${this.from.get()}`);
     const parentFolder = globParent(this.from.get());
     this.syncWatcher = chokidar.watch(this.from.get(), { persistent: true, ignoreInitial: true, usePolling: true });
     this.syncWatcher.on('all', (event, path, stat) => {
@@ -71,6 +83,7 @@ export default class SyncRecord {
 
   stopAutoSync() {
     if (this.syncWatcher) {
+      logger.log(`Stopped syncing ${this.from.get()}`);
       void this.syncWatcher.close();
       this.syncWatcher = null;
     }

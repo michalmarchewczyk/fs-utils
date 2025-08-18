@@ -65,12 +65,12 @@ export default class SyncManager {
     this.records.push(record);
   }
 
-  replaceRecord(newRecord: SyncRecord) {
-    const record = this.records.find((r) => r.id === newRecord.id);
+  modifyRecord(newRecordData: SyncRecordDto) {
+    const record = this.records.find((r) => r.id === newRecordData.id);
     if (!record) {
       throw new Error('Record not found');
     }
-    Object.assign(record, newRecord);
+    record.modify(newRecordData);
   }
 
   swapRecord(id: string) {
