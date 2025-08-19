@@ -47,7 +47,6 @@ export default class SyncRecord {
   }
 
   public set autoSync(value: boolean) {
-    console.log('SET AUTO SYNC', this.from.get(), value, this.syncWatcher !== null);
     this.stopAutoSync();
     this._autoSync = value;
     if (value) {
